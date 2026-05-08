@@ -1,4 +1,4 @@
-What is GoGame Georgia?
+What is GoGame?
 I built this app to solve a simple problem: gamers in Batumi need a fast way to see if their favorite club has a free PC, and club owners need an easy way to manage those spots.
 
 For Gamers (The Guest View)
@@ -10,7 +10,7 @@ Seat Picker: You don’t just "book a spot"—you pick a specific PC on a grid. 
 
 Simple Form: Just drop your name, number, and when you're coming. It saves everything in the browser so you don't lose your info if you refresh the page.
 
-Admin Panel (The Admin View)
+Admin Panel 
 Private Logins: Each club (Elizeum, Portal, Controller) has its own login so they don't see each other's business.
 
 Real-time Stats: A counter at the top shows exactly how many PCs are busy (like "5 out of 15").
@@ -19,22 +19,22 @@ Request List: When a gamer sends a request, it pops up in the admin panel. One c
 
 Details on Hover: If an admin forgets who is sitting where, they can just hover over a PC to see the user's name and phone number.
 
-🇬🇪 რა არის GoGame Georgia? (მარტივად)
-ეს აპლიკაცია შევქმენი იმისთვის, რომ ბათუმელ გეიმერებს გაუმარტივდეთ ადგილის დაჯავშნა, ხოლო კლუბის მფლობელებს — კლიენტების მართვა.
+ რა არის GoGame? 
+ეს აპლიკაცია შევქმენი იმისთვის, რომ ბათუმელ გეიმერებს გაუმარტივდეთ ადგილის დაჯავშნა, ხოლო კლუბის მფლობელებს — ამ ჯავშნების მართვა.
 
-მოთამაშეებისთვის (სტუმრის გვერდი)
-ცოცხალი რუკა: გამოვიყენე ბათუმის რუკა "Dark" სტილში. მარტივად პოულობ კლუბს ქალაქში.
+მომხმარებელისთვის
+ცოცხალი რუკა: გამოვიყენე ბათუმის რუკამ მარტივად პოულობ კლუბს ქალაქში.
 
-ფოტოები: სანამ დაჯავშნი, ხედავ კლუბის შიდა ინტერიერს.
+ფოტოები: სანამ დაჯავშნი ხედავ კლუბის შიდა ინტერიერს.
 
 ადგილის არჩევა: პირდაპირ სქემაზე ირჩევ იმ კომპიუტერს, რომელიც გინდა. თუ წითელია — დაკავებულია, თუ მწვანეა — შენი.
 
 მონაცემების შენახვა: ყველაფერი ინახება ბრაუზერში, ასე რომ გვერდიც რომ დაარეფრეშო, ჯავშნები არ იკარგება.
 
 ადმინისტრატორებისთვის (მართვის პანელი)
-პირადი გვერდები: Elizeum-ს, Portal-ს და Controller-ს აქვთ თავიანთი ლოგინები და სხვის მონაცემებს ვერ ხედავენ.
+პირადი გვერდები: Elizeum-ს, Portal-ს და Controller-ს აქვთ თავიანთი ლოგინები
 
-სტატისტიკა: ზემოთვე ჩანს რამდენი კომპიუტერია თავისუფალი (მაგ: 5/15-დან).
+სტატისტიკა: ზემოთვე ჩანს რამდენი კომპიუტერია თავისუფალი 
 
 ჯავშნების მიღება: როცა კლიენტი აგზავნის მოთხოვნას, ის მოდის სიაში. ერთი დაჭერით ადასტურებ და ის ადგილი რუკაზე ყველასთვის წითლდება.
 
