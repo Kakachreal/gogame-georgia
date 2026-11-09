@@ -17,10 +17,12 @@ const adminAccounts = {
   controllerbatumi: { pass: "elizeumbetter", clubId: 3 }
 };
 
+const LOCALES = { ka: 'ka-GE', ru: 'ru-RU', en: 'en-US' };
+
 const i18n = {
-  ka: { book: "დაჯავშნა", confirm: "დადასტურება", name: "სახელი", phone: "ტელეფონი", time: "დრო (მაგ: 14-18)", day: "რიცხვი", month: "მაისი", admin: "ადმინი", guest: "სტუმარი", approve: "მიღება", login: "შესვლა", logout: "გამოსვლა", status: "სტატუსი", free: "გათავისუფლება", requests: "მოთხოვნები", pcs: "კომპიუტერები" },
-  ru: { book: "Забронировать", confirm: "Подтвердить", name: "Имя", phone: "Телефон", time: "Время (напр: 14-18)", day: "Число", month: "Мая", admin: "Админ", guest: "Гость", approve: "Принять", login: "Войти", logout: "Выйти", status: "Статус", free: "Освободить", requests: "Заявки", pcs: "Компьютеры" },
-  en: { book: "Book Now", confirm: "Confirm", name: "Name", phone: "Phone", time: "Time (ex: 2-6pm)", day: "Day", month: "May", admin: "Admin", guest: "Guest", approve: "Approve", login: "Login", logout: "Logout", status: "Status", free: "Free Up", requests: "Requests", pcs: "Computers" }
+  ka: { book: "დაჯავშნა", confirm: "დადასტურება", name: "სახელი", phone: "ტელეფონი", time: "დრო (მაგ: 14-18)", day: "რიცხვი", admin: "ადმინი", guest: "სტუმარი", approve: "მიღება", login: "შესვლა", logout: "გამოსვლა", status: "სტატუსი", free: "გათავისუფლება", requests: "მოთხოვნები", pcs: "კომპიუტერები", back: "უკან", sent: "მოთხოვნა გაიგზავნა!", fillAll: "შეავსეთ ყველა ველი!", badDay: "რიცხვი უნდა იყოს 1-დან 31-მდე", alreadyRequested: "ეს კომპიუტერი უკვე დაჯავშნილია მოთხოვნით", badLogin: "არასწორი მონაცემები!", occupied: "დაკავებული", available: "თავისუფალი" },
+  ru: { book: "Забронировать", confirm: "Подтвердить", name: "Имя", phone: "Телефон", time: "Время (напр: 14-18)", day: "Число", admin: "Админ", guest: "Гость", approve: "Принять", login: "Войти", logout: "Выйти", status: "Статус", free: "Освободить", requests: "Заявки", pcs: "Компьютеры", back: "Назад", sent: "Заявка отправлена!", fillAll: "Заполните все поля!", badDay: "Число должно быть от 1 до 31", alreadyRequested: "Этот компьютер уже забронирован заявкой", badLogin: "Неверные данные!", occupied: "Занят", available: "Свободен" },
+  en: { book: "Book Now", confirm: "Confirm", name: "Name", phone: "Phone", time: "Time (ex: 2-6pm)", day: "Day", admin: "Admin", guest: "Guest", approve: "Approve", login: "Login", logout: "Logout", status: "Status", free: "Free Up", requests: "Requests", pcs: "Computers", back: "Back", sent: "Request sent!", fillAll: "Fill all fields!", badDay: "Day must be between 1 and 31", alreadyRequested: "This computer already has a pending request", badLogin: "Invalid credentials!", occupied: "Occupied", available: "Free" }
 };
 
 function MapHandler({ isVisible }) {
@@ -53,39 +55,61 @@ function App() {
 
   const [activeClubId, setActiveClubId] = useState(null);
   const [selectedComp, setSelectedComp] = useState(null);
-  const [userForm, setUserForm] = useState({ name: '', phone: '', timeText: '', day: '' });
+  const emptyForm = { name: '', phone: '', timeText: '', day: '' };
+  const [userForm, setUserForm] = useState(() => {
+    try {
+      const saved = localStorage.getItem('gogame_form');
+      return saved ? { ...emptyForm, ...JSON.parse(saved) } : emptyForm;
+    } catch {
+      return emptyForm;
+    }
+  });
 
   useEffect(() => {
-    localStorage.setItem('gogame_clubs', JSON.stringify(clubs));
-    localStorage.setItem('gogame_bookings', JSON.stringify(bookings));
-  }, [clubs, bookings]);
+    try {
+      localStorage.setItem('gogame_clubs', JSON.stringify(clubs));
+      localStorage.setItem('gogame_bookings', JSON.stringify(bookings));
+      localStorage.setItem('gogame_form', JSON.stringify(userForm));
+    } catch {
+      // storage unavailable (private mode / full) — app keeps working in memory
+    }
+  }, [clubs, bookings, userForm]);
 
   const handleLogin = () => {
-    const acc = adminAccounts[authForm.user.toLowerCase()];
-    if (acc && acc.pass === authForm.pass) { 
-      setAuthClubId(acc.clubId); 
-      setView('admin'); 
-    } else { 
-      alert("Invalid credentials!"); 
+    const acc = adminAccounts[authForm.user.trim().toLowerCase()];
+    if (acc && acc.pass === authForm.pass) {
+      setAuthClubId(acc.clubId);
+      setView('admin');
+    } else {
+      alert(t.badLogin);
     }
   };
 
   const handleOrder = (club) => {
-    if (!userForm.name || !userForm.phone || !userForm.timeText || !userForm.day) return alert("Fill all fields!");
-    
-    const newBooking = { 
-      id: Date.now(), 
-      clubId: club.id, 
-      pc: selectedComp, 
-      name: userForm.name,
-      phone: userForm.phone,
-      time: userForm.timeText,
-      date: `${userForm.day} ${i18n[lang].month} 2026`
+    const day = Number(userForm.day);
+    if (!userForm.name.trim() || !userForm.phone.trim() || !userForm.timeText.trim() || !userForm.day) {
+      return alert(t.fillAll);
+    }
+    if (!Number.isInteger(day) || day < 1 || day > 31) return alert(t.badDay);
+    if (bookings.some(b => b.clubId === club.id && b.pc === selectedComp)) return alert(t.alreadyRequested);
+
+    const now = new Date();
+    const dateLabel = new Date(now.getFullYear(), now.getMonth(), day)
+      .toLocaleDateString(LOCALES[lang], { day: 'numeric', month: 'long', year: 'numeric' });
+
+    const newBooking = {
+      id: Date.now(),
+      clubId: club.id,
+      pc: selectedComp,
+      name: userForm.name.trim(),
+      phone: userForm.phone.trim(),
+      time: userForm.timeText.trim(),
+      date: dateLabel
     };
-    
-    setBookings([newBooking, ...bookings]);
-    alert("Request sent!");
-    setActiveClubId(null); setSelectedComp(null); setUserForm({ name: '', phone: '', timeText: '', day: '' });
+
+    setBookings(prev => [newBooking, ...prev]);
+    alert(t.sent);
+    setActiveClubId(null); setSelectedComp(null); setUserForm(emptyForm);
   };
 
   const approveOrder = (b) => {
@@ -105,7 +129,6 @@ function App() {
 
   const t = i18n[lang];
   const currentClub = clubs.find(c => c.id === authClubId);
-
   return (
     <div className="app-container">
       <header className="navbar">
@@ -127,7 +150,11 @@ function App() {
         <div className={`map-box ${view === 'guest' ? 'active' : ''}`}>
           <MapContainer center={locations.batumi} zoom={14} className="leaflet-container">
             <MapHandler isVisible={view === 'guest'} />
-            <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              className="dark-tiles"
+            />
             {clubs.map(club => (
               <Marker key={club.id} position={club.coords}>
                 <Popup closeOnClick={false}>
@@ -157,7 +184,7 @@ function App() {
                             <button className="btn-main confirm" onClick={() => handleOrder(club)}>{t.confirm}</button>
                           </div>
                         )}
-                        <button className="btn-back" onClick={() => {setActiveClubId(null); setSelectedComp(null)}}>← {lang === 'ru' ? 'Назад' : 'Back'}</button>
+                        <button className="btn-back" onClick={() => {setActiveClubId(null); setSelectedComp(null)}}>← {t.back}</button>
                       </div>
                     )}
                   </div>
@@ -171,8 +198,8 @@ function App() {
           <div className="overlay center">
             <div className="auth-card">
               <h2>ADMIN PANEL</h2>
-              <input placeholder="Login" value={authForm.user} onChange={e => setAuthForm({...authForm, user: e.target.value})} />
-              <input type="password" placeholder="Password" value={authForm.pass} onChange={e => setAuthForm({...authForm, pass: e.target.value})} />
+              <input placeholder={t.login} autoComplete="username" value={authForm.user} onChange={e => setAuthForm({...authForm, user: e.target.value})} />
+              <input type="password" placeholder="Password" autoComplete="current-password" value={authForm.pass} onChange={e => setAuthForm({...authForm, pass: e.target.value})} onKeyDown={e => e.key === 'Enter' && handleLogin()} />
               <button className="btn-main" onClick={handleLogin}>{t.login}</button>
             </div>
           </div>
@@ -213,7 +240,7 @@ function App() {
                     <div key={pc.id} className={`pc-row-managed ${pc.busy ? 'is-occupied' : 'is-available'}`}>
                       <div className="pc-label-wrapper">
                         <span className="pc-num">#{pc.id}</span>
-                        <span className="pc-status-text">{pc.busy ? 'OCCUPIED' : 'FREE'}</span>
+                        <span className="pc-status-text">{pc.busy ? t.occupied : t.available}</span>
                         {pc.busy && pc.user && (
                           <div className="info-tooltip">
                             <div className="tooltip-inner">

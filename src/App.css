@@ -17,6 +17,8 @@ button.active { border-color: #00f2ff; color: #00f2ff; background: rgba(0, 242, 
 .map-box { position: absolute; width: 100%; height: 100%; visibility: hidden; opacity: 0; }
 .map-box.active { visibility: visible; opacity: 1; }
 .leaflet-container { height: 100%; width: 100%; }
+/* dark map theme: invert the OpenStreetMap tiles */
+.dark-tiles { filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9); }
 
 /* popups  */
 .ui-popup { color: #111; min-width: 240px; padding: 5px; }
@@ -82,4 +84,20 @@ button.active { border-color: #00f2ff; color: #00f2ff; background: rgba(0, 242, 
 .animate-in { animation: slideUp 0.3s ease-out; }
 @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+.pc-box:focus-visible, .btn-main:focus-visible, button:focus-visible { outline: 2px solid #00f2ff; outline-offset: 2px; }
+
 @media (max-width: 900px) { .admin-layout { grid-template-columns: 1fr; } }
+
+@media (max-width: 600px) {
+  .navbar { flex: 0 0 auto; flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+  .nav { flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+  .logo { font-size: 1.1rem; }
+  .nav button { padding: 6px 10px; }
+  .p24 { padding: 16px; }
+  .admin-header { flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+  .admin-header h1 { font-size: 22px; }
+  .auth-card { width: min(360px, calc(100vw - 32px)); padding: 24px; }
+  .request-card { flex-direction: column; align-items: stretch; gap: 12px; }
+  .btn-approve { width: 100%; }
+  .pc-row-managed .info-tooltip { display: none; }
+}
